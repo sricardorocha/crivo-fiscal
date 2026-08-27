@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crivo Fiscal</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1115;color:#e6e8eb;line-height:1.5;padding:24px 16px 60px}
+.wrap{max-width:1000px;margin:0 auto}
+header{border-bottom:1px solid #262b33;padding-bottom:16px;margin-bottom:20px}
+h1{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.sub{color:#8b939f;font-size:13px;margin-top:4px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+input[type=search]{flex:1;min-width:200px;background:#171a20;border:1px solid #262b33;color:#e6e8eb;padding:9px 12px;border-radius:7px;font-size:14px}
+input[type=search]:focus{outline:none;border-color:#3d6fd9}
+select{background:#171a20;border:1px solid #262b33;color:#e6e8eb;padding:9px 10px;border-radius:7px;font-size:13px}
+.card{background:#171a20;border:1px solid #262b33;border-radius:9px;margin-bottom:10px;overflow:hidden}
+.head{padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.head:hover{background:#1c2028}
+.tt{flex:1;min-width:0}
+.tt h2{font-size:15px;font-weight:600;margin-bottom:5px}
+.meta{font-size:12px;color:#8b939f}
+.pills{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.p{font-size:10.5px;padding:3px 8px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+.v-procede{background:#0f2f1c;color:#4ade80}.v-parcial{background:#33280c;color:#fbbf24}
+.v-nao{background:#3a1418;color:#f87171}.v-desatualizado{background:#2a2f38;color:#9ca3af}
+.v-referencia{background:#12283f;color:#60a5fa}.v-rascunho{background:#2a2f38;color:#9ca3af}
+.r-alto{background:#3a1418;color:#f87171}.r-medio{background:#33280c;color:#fbbf24}.r-baixo{background:#0f2f1c;color:#4ade80}
+.body{display:none;padding:0 16px 16px;border-top:1px solid #262b33}
+.card.open .body{display:block}
+.sec{margin-top:14px}
+.sec h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#8b939f;margin-bottom:5px;font-weight:600}
+.sec p{font-size:13.5px;color:#c9ced6}
+.legal{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#12151a;padding:9px 11px;border-radius:6px;border-left:2px solid #3d6fd9;color:#a8b2bf}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
+.tag{font-size:11px;background:#1f242c;color:#9ca3af;padding:3px 8px;border-radius:5px}
+a.link{color:#60a5fa;font-size:12px;text-decoration:none;display:inline-block;margin-top:12px}
+a.link:hover{text-decoration:underline}
+.empty{text-align:center;padding:50px 20px;color:#8b939f;font-size:14px}
+.alert{background:#33280c;border:1px solid #57430f;color:#fbbf24;padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.count{font-size:12px;color:#8b939f;margin-bottom:12px}
+</style></head><body><div class="wrap">
+<header><h1>Crivo Fiscal</h1><div class="sub">Acervo de conteúdo tributário verificado</div></header>
+<div id="alerta"></div>
+<div class="bar">
+<input type="search" id="q" placeholder="Buscar por título, tema, base legal...">
+<select id="fv"><option value="">Veredito: todos</option><option value="procede">Procede</option><option value="parcial">Parcial</option><option value="nao">Não procede</option><option value="desatualizado">Desatualizado</option><option value="referencia">Referência</option><option value="rascunho">Rascunho</option></select>
+<select id="fr"><option value="">Risco: todos</option><option value="alto">Alto</option><option value="medio">Médio</option><option value="baixo">Baixo</option></select>
+</div>
+<div class="count" id="cnt"></div>
+<div id="lista"><div class="empty">Carregando acervo...</div></div>
+</div><script>
+var FICHAS=[];
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function sec(t,v){return v?'<div class="sec"><h3>'+t+'</h3><p>'+esc(v)+'</p></div>':''}
+function render(){
+ var q=document.getElementById('q').value.toLowerCase();
+ var fv=document.getElementById('fv').value, fr=document.getElementById('fr').value;
+ var lista=FICHAS.filter(function(f){
+  if(fv&&f.veredito!==fv)return false;
+  if(fr&&f.risco!==fr)return false;
+  if(!q)return true;
+  return [f.titulo,f.tema,f.baseLegal,f.autor,f.afirma,(f.tags||[]).join(' ')].join(' ').toLowerCase().indexOf(q)>-1;
+ });
+ document.getElementById('cnt').textContent=lista.length+' de '+FICHAS.length+' fichas';
+ if(!lista.length){document.getElementById('lista').innerHTML='<div class="empty">Nenhuma ficha encontrada.</div>';return}
+ document.getElementById('lista').innerHTML=lista.map(function(f){
+  var vl={procede:'Procede',parcial:'Parcial',nao:'Não procede',desatualizado:'Desatualizado',referencia:'Referência',rascunho:'Rascunho'}[f.veredito]||f.veredito||'—';
+  var rl={alto:'Risco alto',medio:'Risco médio',baixo:'Risco baixo'}[f.risco]||'';
+  return '<div class="card"><div class="head" onclick="this.parentNode.classList.toggle(\'open\')">'
+  +'<div class="tt"><h2>'+esc(f.titulo)+'</h2><div class="meta">'+esc(f.autor||'')+(f.publicado?' &middot; '+esc(f.publicado):'')+(f.tema?' &middot; '+esc(f.tema):'')+'</div></div>'
+  +'<div class="pills"><span class="p v-'+esc(f.veredito)+'">'+esc(vl)+'</span>'+(rl?'<span class="p r-'+esc(f.risco)+'">'+esc(rl)+'</span>':'')+'</div></div>'
+  +'<div class="body">'+sec('O que afirma',f.afirma)+sec('O que procede',f.procede)+sec('O que não se sustenta / ressalvas',f.naoProcede)
+  +(f.baseLegal?'<div class="sec"><h3>Base legal</h3><div class="legal">'+esc(f.baseLegal)+'</div></div>':'')
+  +sec('Regimes',f.regimes)+sec('Ação prática',f.acao)+sec('Pendências de verificação',f.pendencias)
+  +((f.tags&&f.tags.length)?'<div class="tags">'+f.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('')+'</div>':'')
+  +(f.link?'<a class="link" href="'+esc(f.link)+'" target="_blank" rel="noopener">Abrir conteúdo original &rarr;</a>':'')
+  +'</div></div>';
+ }).join('');
+}
+document.getElementById('q').addEventListener('input',render);
+document.getElementById('fv').addEventListener('change',render);
+document.getElementById('fr').addEventListener('change',render);
+fetch('/webhook/crivo-acervo').then(function(r){return r.json()}).then(function(d){
+ FICHAS=d.fichas||[];
+ if(d.consolidar&&d.consolidar.length){document.getElementById('alerta').innerHTML='<div class="alert"><strong>Consolidação sugerida:</strong> '+d.consolidar.map(esc).join(', ')+' &mdash; 3+ fichas. Vale subir para uma skill temática.</div>'}
+ render();
+}).catch(function(e){document.getElementById('lista').innerHTML='<div class="empty">Erro ao carregar: '+esc(e.message)+'</div>'});
+</script></body></html>
