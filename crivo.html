@@ -2,13 +2,26 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1115;color:#e6e8eb;line-height:1.5;padding:24px 16px 60px}
 .wrap{max-width:1000px;margin:0 auto}
-header{border-bottom:1px solid #262b33;padding-bottom:16px;margin-bottom:20px}
+header{border-bottom:1px solid #262b33;padding-bottom:16px;margin-bottom:20px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.hl{flex:1;min-width:220px}
 h1{font-size:22px;font-weight:600;letter-spacing:-.01em}
 .sub{color:#8b939f;font-size:13px;margin-top:4px}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-input[type=search]{flex:1;min-width:200px;background:#171a20;border:1px solid #262b33;color:#e6e8eb;padding:9px 12px;border-radius:7px;font-size:14px}
-input[type=search]:focus{outline:none;border-color:#3d6fd9}
+input[type=search],input[type=text]{flex:1;min-width:180px;background:#171a20;border:1px solid #262b33;color:#e6e8eb;padding:9px 12px;border-radius:7px;font-size:14px}
+input:focus{outline:none;border-color:#3d6fd9}
 select{background:#171a20;border:1px solid #262b33;color:#e6e8eb;padding:9px 10px;border-radius:7px;font-size:13px}
+button{background:#3d6fd9;border:none;color:#fff;padding:9px 16px;border-radius:7px;font-size:13.5px;font-weight:600;cursor:pointer}
+button:hover{background:#3462c4}
+button.ghost{background:transparent;border:1px solid #262b33;color:#8b939f;font-weight:500}
+button.ghost:hover{background:#1c2028;color:#e6e8eb}
+.sessao{display:flex;gap:10px;align-items:center;font-size:12.5px;color:#8b939f;flex-shrink:0}
+.sessao b{color:#e6e8eb;font-weight:600}
+.plano{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;background:#12283f;color:#60a5fa;padding:2px 7px;border-radius:20px;font-weight:700}
+.login{background:#171a20;border:1px solid #262b33;border-radius:9px;padding:14px 16px;margin-bottom:18px}
+.login h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.login p{font-size:12.5px;color:#8b939f;margin-bottom:10px}
+.login form{display:flex;gap:8px;flex-wrap:wrap}
+.erro{color:#f87171;font-size:12.5px;margin-top:8px}
 .card{background:#171a20;border:1px solid #262b33;border-radius:9px;margin-bottom:10px;overflow:hidden}
 .head{padding:14px 16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
 .head:hover{background:#1c2028}
@@ -27,6 +40,9 @@ select{background:#171a20;border:1px solid #262b33;color:#e6e8eb;padding:9px 10p
 .sec h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#8b939f;margin-bottom:5px;font-weight:600}
 .sec p{font-size:13.5px;color:#c9ced6}
 .legal{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;background:#12151a;padding:9px 11px;border-radius:6px;border-left:2px solid #3d6fd9;color:#a8b2bf}
+.trancado{margin-top:14px;background:#12151a;border:1px dashed #2f3641;border-radius:7px;padding:16px;text-align:center}
+.trancado p{font-size:13px;color:#8b939f}
+.trancado strong{color:#e6e8eb;display:block;margin-bottom:4px;font-size:13.5px}
 .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}
 .tag{font-size:11px;background:#1f242c;color:#9ca3af;padding:3px 8px;border-radius:5px}
 a.link{color:#60a5fa;font-size:12px;text-decoration:none;display:inline-block;margin-top:12px}
@@ -34,8 +50,13 @@ a.link:hover{text-decoration:underline}
 .empty{text-align:center;padding:50px 20px;color:#8b939f;font-size:14px}
 .alert{background:#33280c;border:1px solid #57430f;color:#fbbf24;padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:16px}
 .count{font-size:12px;color:#8b939f;margin-bottom:12px}
+.aviso{border-top:1px solid #262b33;margin-top:32px;padding-top:16px;font-size:11.5px;color:#6b7280;line-height:1.6}
 </style></head><body><div class="wrap">
-<header><h1>Crivo Fiscal</h1><div class="sub">Acervo de conteúdo tributário verificado</div></header>
+<header>
+<div class="hl"><h1>Crivo Fiscal</h1><div class="sub">Acervo de conteúdo tributário verificado</div></div>
+<div class="sessao" id="sessao"></div>
+</header>
+<div id="acesso"></div>
 <div id="alerta"></div>
 <div class="bar">
 <input type="search" id="q" placeholder="Buscar por título, tema, base legal...">
@@ -44,10 +65,37 @@ a.link:hover{text-decoration:underline}
 </div>
 <div class="count" id="cnt"></div>
 <div id="lista"><div class="empty">Carregando acervo...</div></div>
+<div class="aviso">O Crivo Fiscal reúne verificação técnica de conteúdo tributário de terceiros. É informação técnica de apoio, não constitui parecer nem consultoria personalizada, e não substitui a análise do caso concreto por profissional habilitado. Adesão a tese tributária é decisão do contribuinte, por escrito, com advogado responsável e medida judicial própria. Os resumos citam obra de terceiros na medida justificada para crítica e estudo, com indicação do autor e da origem, nos termos do art. 46, III da Lei 9.610/98.</div>
 </div><script>
-var FICHAS=[];
+var FICHAS=[],SESSAO=null;
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function sec(t,v){return v?'<div class="sec"><h3>'+t+'</h3><p>'+esc(v)+'</p></div>':''}
+function tok(){try{return localStorage.getItem('crivo_token')||''}catch(e){return ''}}
+function setTok(v){try{v?localStorage.setItem('crivo_token',v):localStorage.removeItem('crivo_token')}catch(e){}}
+function pintaSessao(){
+ var el=document.getElementById('sessao'),ac=document.getElementById('acesso');
+ if(SESSAO&&SESSAO.autenticado){
+  el.innerHTML='<span><b>'+esc(SESSAO.titular||'assinante')+'</b></span><span class="plano">'+esc(SESSAO.plano||'')+'</span><button class="ghost" id="sair">Sair</button>';
+  document.getElementById('sair').onclick=function(){setTok('');location.reload()};
+  ac.innerHTML='';
+ }else{
+  el.innerHTML='';
+  ac.innerHTML='<div class="login"><h3>Acesso de assinante</h3><p>Informe sua chave de acesso para abrir as análises completas. Sem chave, você vê a vitrine.</p>'
+   +'<form id="fl"><input type="text" id="chave" placeholder="Sua chave de acesso" autocomplete="off"><button type="submit">Entrar</button></form><div class="erro" id="erroLogin"></div></div>';
+  document.getElementById('fl').onsubmit=function(e){e.preventDefault();entrar()};
+ }
+}
+function entrar(){
+ var c=document.getElementById('chave').value.trim(),er=document.getElementById('erroLogin');
+ if(!c){er.textContent='Informe a chave.';return}
+ er.textContent='Verificando...';
+ fetch('/webhook/crivo-auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({chave:c})})
+  .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j}})})
+  .then(function(res){
+    if(res.ok&&res.j.token){setTok(res.j.token);carregar()}
+    else{er.textContent=res.j.erro||'Acesso negado.'}
+  }).catch(function(e){er.textContent='Falha na verificação: '+e.message});
+}
 function render(){
  var q=document.getElementById('q').value.toLowerCase();
  var fv=document.getElementById('fv').value, fr=document.getElementById('fr').value;
@@ -62,23 +110,39 @@ function render(){
  document.getElementById('lista').innerHTML=lista.map(function(f){
   var vl={procede:'Procede',parcial:'Parcial',nao:'Não procede',desatualizado:'Desatualizado',referencia:'Referência',rascunho:'Rascunho'}[f.veredito]||f.veredito||'—';
   var rl={alto:'Risco alto',medio:'Risco médio',baixo:'Risco baixo'}[f.risco]||'';
+  var corpo;
+  if(f.restrita){
+   corpo='<div class="trancado"><p><strong>Análise completa disponível para assinantes</strong>'
+    +'O que a peça afirma, o que procede, o que não se sustenta, a base legal e a ação prática com a carteira ficam abertos com a chave de acesso.</p></div>';
+  }else{
+   corpo=sec('O que afirma',f.afirma)+sec('O que procede',f.procede)+sec('O que não se sustenta / ressalvas',f.naoProcede)
+    +(f.baseLegal?'<div class="sec"><h3>Base legal</h3><div class="legal">'+esc(f.baseLegal)+'</div></div>':'')
+    +sec('Regimes',f.regimes)+sec('Ação prática',f.acao)+sec('Pendências de verificação',f.pendencias);
+  }
   return '<div class="card"><div class="head" onclick="this.parentNode.classList.toggle(\'open\')">'
   +'<div class="tt"><h2>'+esc(f.titulo)+'</h2><div class="meta">'+esc(f.autor||'')+(f.publicado?' &middot; '+esc(f.publicado):'')+(f.tema?' &middot; '+esc(f.tema):'')+'</div></div>'
   +'<div class="pills"><span class="p v-'+esc(f.veredito)+'">'+esc(vl)+'</span>'+(rl?'<span class="p r-'+esc(f.risco)+'">'+esc(rl)+'</span>':'')+'</div></div>'
-  +'<div class="body">'+sec('O que afirma',f.afirma)+sec('O que procede',f.procede)+sec('O que não se sustenta / ressalvas',f.naoProcede)
-  +(f.baseLegal?'<div class="sec"><h3>Base legal</h3><div class="legal">'+esc(f.baseLegal)+'</div></div>':'')
-  +sec('Regimes',f.regimes)+sec('Ação prática',f.acao)+sec('Pendências de verificação',f.pendencias)
+  +'<div class="body">'+corpo
   +((f.tags&&f.tags.length)?'<div class="tags">'+f.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('')+'</div>':'')
   +(f.link?'<a class="link" href="'+esc(f.link)+'" target="_blank" rel="noopener">Abrir conteúdo original &rarr;</a>':'')
   +'</div></div>';
  }).join('');
 }
+function carregar(){
+ var h={};var t=tok();if(t)h['authorization']='Bearer '+t;
+ fetch('/webhook/crivo-acervo',{headers:h}).then(function(r){return r.json()}).then(function(d){
+  SESSAO={autenticado:!!d.autenticado,titular:d.titular,plano:d.plano};
+  if(!d.autenticado&&t)setTok('');
+  FICHAS=d.fichas||[];
+  pintaSessao();
+  if(d.consolidar&&d.consolidar.length){document.getElementById('alerta').innerHTML='<div class="alert"><strong>Consolidação sugerida:</strong> '+d.consolidar.map(esc).join(', ')+' &mdash; 3+ fichas. Vale subir para uma skill temática.</div>'}
+  else{document.getElementById('alerta').innerHTML=''}
+  render();
+ }).catch(function(e){document.getElementById('lista').innerHTML='<div class="empty">Erro ao carregar: '+esc(e.message)+'</div>'});
+}
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('fv').addEventListener('change',render);
 document.getElementById('fr').addEventListener('change',render);
-fetch('/webhook/crivo-acervo').then(function(r){return r.json()}).then(function(d){
- FICHAS=d.fichas||[];
- if(d.consolidar&&d.consolidar.length){document.getElementById('alerta').innerHTML='<div class="alert"><strong>Consolidação sugerida:</strong> '+d.consolidar.map(esc).join(', ')+' &mdash; 3+ fichas. Vale subir para uma skill temática.</div>'}
- render();
-}).catch(function(e){document.getElementById('lista').innerHTML='<div class="empty">Erro ao carregar: '+esc(e.message)+'</div>'});
+pintaSessao();
+carregar();
 </script></body></html>
